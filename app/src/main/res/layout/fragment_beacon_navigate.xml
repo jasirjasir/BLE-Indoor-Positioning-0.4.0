@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/relative_layout"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+   <!-- android:background="@drawable/gracevilla_gf"-->
+<FrameLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/plan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="-1dp"
+        android:layout_marginTop="-19dp"
+        android:src="@drawable/newhome1"></ImageView>
+</FrameLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="10dp"
+        android:layout_alignParentBottom="true">
+
+    <Spinner
+        android:id="@+id/start_spinner"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_blue_light"
+        android:entries="@array/start_roomlist"
+        android:paddingEnd="10dp"
+        android:spinnerMode="dialog"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="20dp"   />
+
+
+        <Spinner
+            android:id="@+id/stop_spinner"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_blue_light"
+            android:entries="@array/stop_roomlist"
+            android:layout_marginLeft="150dp"
+            android:spinnerMode="dialog" />
+        <ImageView
+            android:id="@+id/go_button"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/forward_48"
+            android:layout_alignParentRight="true"
+            android:clickable="true"
+            android:layout_marginRight="25dp" />
+
+    </RelativeLayout>
+</RelativeLayout>
