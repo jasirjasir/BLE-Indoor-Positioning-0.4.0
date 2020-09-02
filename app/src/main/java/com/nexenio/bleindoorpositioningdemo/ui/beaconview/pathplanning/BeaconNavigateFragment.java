@@ -147,6 +147,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
                 list = new ArrayList<String>();
                 for (Beacon beacon : beaconlist){
                     if (beacon.getMinorId()!=0 && beacon.getRssi()>-90 ) {
+                        //github
                        // Log.d(LOGTAG,"name= "+beacon.getName()+" -> distance= "+beacon.getDistance()*100);
                         beacon_count++;
                         //sb.append("~NAME:" + beacon.getName());
