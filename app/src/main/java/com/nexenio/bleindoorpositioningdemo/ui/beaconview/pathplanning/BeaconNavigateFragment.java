@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -61,7 +62,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
     List<String[]> beacon_data_list;
     ArrayList<String> list;
     String start_loc,stop_loc;
-    Spinner start_spinner,stop_spinner;
+    AutoCompleteTextView start_act,stop_act;
     HashMap<String,int[]> hm_location=new HashMap<String, int[]>();
     BitmapFactory.Options options = new BitmapFactory.Options();
 
@@ -287,12 +288,14 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
         tempCanvas.drawBitmap(myBitmap, 0, 0, null);
         //tempCanvas1.drawBitmap(myBitmap, 0, 0, null);
         ImageView Go_button= (ImageView)getView().findViewById(R.id.go_button);
-        start_spinner = (Spinner)getView().findViewById(R.id.start_spinner);
-        stop_spinner = (Spinner)getView().findViewById(R.id.stop_spinner);
+        start_act = (AutoCompleteTextView) getView().findViewById(R.id.start_act);
+        stop_act = (AutoCompleteTextView)getView().findViewById(R.id.stop_act);
         SetItemstoView(); //set spinner data
         Go_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                start_loc = start_act.getText().toString();
+                stop_loc = stop_act.getText().toString();
                 if ((start_loc.trim().equalsIgnoreCase("Start")||stop_loc.trim().equalsIgnoreCase("Stop")||(start_loc.trim().equalsIgnoreCase(stop_loc.trim())))) {
                     Toast.makeText(getActivity().getApplicationContext(), "Please choose correct locations !!", Toast.LENGTH_SHORT).show();
 
@@ -306,7 +309,12 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
                        Toast.makeText(getActivity().getApplicationContext(), "Could not read your current location !!", Toast.LENGTH_SHORT).show();
                    }
                 }else{
-                    input_cordinates=new int[]{hm_location.get(start_loc)[0],hm_location.get(start_loc)[1],hm_location.get(stop_loc)[0],hm_location.get(stop_loc)[1]};
+                    try {
+                        input_cordinates=new int[]{hm_location.get(start_loc)[0],hm_location.get(start_loc)[1],hm_location.get(stop_loc)[0],hm_location.get(stop_loc)[1]};
+                    } catch (NullPointerException e) {
+                        Toast.makeText(getContext(), "Enter valid location", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
                     performNavigation(input_cordinates);
                 }
 
@@ -365,12 +373,14 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
         ArrayAdapter<String> stop_adapter = new ArrayAdapter<>( getActivity(), R.layout.custom_spinner,getResources().getStringArray(R.array.stop_roomlist));
         start_adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown);
         stop_adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown);
-        start_spinner.setAdapter(start_adapter);
-        stop_spinner.setAdapter(stop_adapter);
-        start_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        start_act.setThreshold(1);
+        stop_act.setThreshold(1);
+        start_act.setAdapter(start_adapter);
+        stop_act.setAdapter(stop_adapter);
+        start_act.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                start_loc=start_spinner.getItemAtPosition(position).toString();
+                start_loc = start_act.getText().toString();
 
             }
 
@@ -379,10 +389,10 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
 
             }
         });
-        stop_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        stop_act.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                stop_loc=stop_spinner.getItemAtPosition(position).toString();
+                stop_loc=stop_act.getText().toString();
             }
 
             @Override

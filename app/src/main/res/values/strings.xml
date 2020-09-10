@@ -101,4 +101,8 @@
         <item>D-3</item>
         <item>D-4</item>
     </string-array>
+
+    <string name="start_txt">Start</string>
+    <string name="stop_txt">Stop</string>
+    <string name="indoor_navigation">Indoor Navigation</string>
 </resources>

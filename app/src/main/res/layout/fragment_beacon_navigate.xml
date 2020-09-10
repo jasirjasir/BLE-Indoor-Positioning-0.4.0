@@ -1,62 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:id="@+id/relative_layout"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-   <!-- android:background="@drawable/gracevilla_gf"-->
-<FrameLayout
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    <ImageView
-        android:id="@+id/plan"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
 
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="-1dp"
-        android:layout_marginTop="-19dp"
-        android:src="@drawable/newhome1"></ImageView>
-</FrameLayout>
-    <RelativeLayout
+    <!-- android:background="@drawable/gracevilla_gf"-->
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/plan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="-1dp"
+            android:layout_marginTop="-19dp"
+            android:src="@drawable/newhome1"></ImageView>
+    </FrameLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
         android:layout_marginBottom="10dp"
-        android:layout_alignParentBottom="true">
+        android:layout_marginTop="10dp"
+        android:paddingBottom="5dp"
+        android:orientation="horizontal"
+        android:weightSum="5">
 
-    <Spinner
-        android:id="@+id/start_spinner"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/holo_blue_light"
-        android:entries="@array/start_roomlist"
-        android:paddingEnd="10dp"
-        android:spinnerMode="dialog"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="20dp"   />
+        <AutoCompleteTextView
+            android:id="@+id/start_act"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_weight="2.15"
+            android:background="@drawable/button_bg"
+            android:dropDownHeight="match_parent"
+            android:entries="@array/start_roomlist"
+            android:hint="@string/start_txt"
+            android:lines="1"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textColor="@color/primary_dark" />
+        <!--<Spinner
+            android:id="@+id/start_spinner"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="20dp"
+            android:background="@android:color/holo_blue_light"
+            android:entries="@array/start_roomlist"
+            android:paddingEnd="10dp"
+            android:spinnerMode="dialog" />-->
+        <AutoCompleteTextView
+            android:id="@+id/stop_act"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_weight="2.15"
+            android:background="@drawable/button_bg"
+            android:dropDownHeight="match_parent"
+            android:entries="@array/stop_roomlist"
+            android:hint="@string/stop_txt"
+            android:lines="1"
+            android:paddingStart="10dp"
+            android:textColor="@color/primary_dark" />
 
-
-        <Spinner
+        <!--<Spinner
             android:id="@+id/stop_spinner"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="150dp"
             android:background="@android:color/holo_blue_light"
             android:entries="@array/stop_roomlist"
-            android:layout_marginLeft="150dp"
-            android:spinnerMode="dialog" />
+            android:spinnerMode="dialog" />-->
+
         <ImageView
             android:id="@+id/go_button"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:src="@drawable/forward_48"
-            android:layout_alignParentRight="true"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_weight="0.7"
+            android:layout_gravity="center"
             android:clickable="true"
-            android:layout_marginRight="25dp" />
+            android:focusable="true"
+            android:background="@drawable/circle_bg"
+            android:src="@drawable/chevron_right" />
 
-    </RelativeLayout>
+    </LinearLayout>
 </RelativeLayout>
