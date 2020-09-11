@@ -17,6 +17,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.nexenio.bleindoorpositioning.location.Location;
 import com.nexenio.bleindoorpositioning.location.multilateration.Multilateration;
@@ -53,15 +55,18 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Log.d(TAG, "App started");
         Log.d(TAG, BluetoothClient.class.getSimpleName());
         // setup UI
         coordinatorLayout = findViewById(R.id.coordinatorLayout);
-        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        /*bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
-        bottomNavigationView.setSelectedItemId(R.id.navigation_radar);
+        bottomNavigationView.setSelectedItemId(R.id.navigation_radar);*/
 
         // setup locationc
         AndroidLocationProvider.initialize(this);
@@ -73,23 +78,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 400);
 
 
-        //Test Multilateration
-      /*  double[] expectedCenter = new double[]{0, 0};
-        double[][] positions = new double[][]{{67, 56}, {0, 10}, {10, 0},{8,8} };
-        double distance = 7.07106781;
-        double[] distances = new double[]{6.8, 5, 9.3,5.5};
-        double ent1=positions[0][0];
-        double ent2=positions[1][1];
-        //double ent3=positions[0][2];
-        Log.d("beacon","ent[0]="+ent1);
-        Log.d("beacon","ent[0]="+ent2);
-        //Log.d("beacon","ent[0]="+ent3);
-        LeastSquaresOptimizer.Optimum optimum = Multilateration.findOptimum(positions, distances);
-        double[] actualCenter = optimum.getPoint().toArray();
-
-         Log.d("beacon","actualCenter[0]="+actualCenter[0]+" actualCenter[1]="+actualCenter[1]);*/
-
-      //  findNearestPixel();
+        getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new BeaconNavigateFragment()).commit();
     }
 
     private void GetLocation() {

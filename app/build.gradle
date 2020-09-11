@@ -55,7 +55,7 @@ android {
     }
     sourceSets {
         main {
-            jniLibs.srcDirs = ['E:/Android_Studio_Projects/BLE-Indoor-Positioning-0.4.0/app/src/main/jniLibs']
+            jniLibs.srcDirs = ['/home/albert/StudioProjects/BLE-Indoor-Positioning-0.4.0/app/src/main/jniLibs']
         }
     }
     externalNativeBuild {

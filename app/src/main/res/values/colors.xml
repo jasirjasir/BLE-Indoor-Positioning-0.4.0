@@ -9,6 +9,7 @@
     <color name="secondary_text">#757575</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
+    <color name="primary_dark_trans">#88455A64</color>
 
     <color name="device">@color/accent</color>
     <color name="beacon">#2196F3</color>

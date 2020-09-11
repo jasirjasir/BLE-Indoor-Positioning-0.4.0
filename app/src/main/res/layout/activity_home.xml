@@ -23,7 +23,7 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
+    <!--<com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,6 +33,6 @@
         app:itemBackground="@color/primary"
         app:itemIconTint="@color/bottom_navigation_item"
         app:itemTextColor="@color/bottom_navigation_item"
-        app:menu="@menu/navigation" />
+        app:menu="@menu/navigation" />-->
 
 </LinearLayout>

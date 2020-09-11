@@ -3,8 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary"
     android:orientation="vertical"
+    android:backgroundTint="@color/primary"
+    android:backgroundTintMode="multiply"
+    android:background="@drawable/map_street"
     tools:context="com.nexenio.bleindoorpositioningdemo.SplashActivity">
 <FrameLayout
     android:id="@+id/llLogo"
@@ -24,9 +26,6 @@
         android:padding="25dp"
         android:elevation="25dp"
         android:src="@drawable/pin_drop" />
-
-
-
 </FrameLayout>
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -66,7 +65,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="App"
+            android:text="v1.0"
             android:textColor="#9CA4CF"
             android:textSize="10sp" />
 

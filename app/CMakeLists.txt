@@ -7,8 +7,8 @@
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 
 #Added 2 path definitions to support 20160825 additions
-set(pathToProject  E:/Android_Studio_Projects/BLE-Indoor-Positioning-0.4.0)
-set(pathToOpenCv E:/Android_Studio_Projects/Util/OpenCV-android-sdk)
+set(pathToProject  /home/albert/StudioProjects/BLE-Indoor-Positioning-0.4.0)
+set(pathToOpenCv /home/albert/StudioProjects/OpenCV-android-sdk)
 
 
 #Added by the IDE on project create

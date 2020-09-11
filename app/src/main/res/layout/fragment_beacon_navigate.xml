@@ -2,33 +2,38 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/relative_layout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:backgroundTint="@color/primary"
+    android:backgroundTintMode="multiply"
+    android:background="@drawable/map_street_light">
 
     <!-- android:background="@drawable/gracevilla_gf"-->
     <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
 
         <ImageView
             android:id="@+id/plan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-
-            android:layout_alignParentTop="true"
             android:layout_marginStart="-1dp"
             android:layout_marginTop="-19dp"
-            android:src="@drawable/newhome1"></ImageView>
+            android:src="@drawable/newhome1" />
     </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
-        android:paddingBottom="5dp"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:background="@color/primary_text"
+        android:backgroundTint="@color/primary_text"
+        android:backgroundTintMode="screen"
+        android:paddingTop="5dp"
         android:weightSum="5">
 
         <AutoCompleteTextView
@@ -44,7 +49,10 @@
             android:lines="1"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:textColor="@color/primary_dark" />
+            android:textColor="@color/primary_light"
+            android:textColorHint="@color/primary_light"
+            android:textSize="24sp"
+            android:elevation="-24dp"/>
         <!--<Spinner
             android:id="@+id/start_spinner"
             android:layout_width="120dp"
@@ -67,7 +75,10 @@
             android:hint="@string/stop_txt"
             android:lines="1"
             android:paddingStart="10dp"
-            android:textColor="@color/primary_dark" />
+            android:textColor="@color/primary_light"
+            android:textColorHint="@color/primary_light"
+            android:textSize="24sp"
+            android:elevation="-24dp"/>
 
         <!--<Spinner
             android:id="@+id/stop_spinner"
@@ -82,13 +93,14 @@
             android:id="@+id/go_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="15dp"
-            android:layout_marginStart="15dp"
-            android:layout_weight="0.7"
             android:layout_gravity="center"
-            android:clickable="true"
-            android:focusable="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_weight="0.7"
             android:background="@drawable/circle_bg"
+            android:clickable="true"
+            android:elevation="25dp"
+            android:focusable="true"
             android:src="@drawable/chevron_right" />
 
     </LinearLayout>

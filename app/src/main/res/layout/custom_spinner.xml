@@ -6,8 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="?attr/dropdownListPreferredItemHeight"
     android:ellipsize="marquee"
-    android:textColor="@color/primary_dark"
-    android:background="@color/primary"
+    android:textColor="@color/primary_light"
+    android:background="@color/primary_dark"
     android:padding="10dp"
+    android:textSize="20sp"
     android:layout_alignParentRight="true"
-    android:backgroundTint="@color/primary"/>
+    android:backgroundTint="@color/primary_dark"/>

@@ -14,6 +14,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -377,29 +378,28 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
         stop_act.setThreshold(1);
         start_act.setAdapter(start_adapter);
         stop_act.setAdapter(stop_adapter);
-        start_act.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                start_loc = start_act.getText().toString();
 
-            }
+        start_act.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
+            public void onItemClick(AdapterView<?> parent, View arg1, int pos,
+                                    long id) {
+                InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(start_act.getWindowToken(), 0);
             }
         });
-        stop_act.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                stop_loc=stop_act.getText().toString();
-            }
+
+        stop_act.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
+            public void onItemClick(AdapterView<?> parent, View arg1, int pos,
+                                    long id) {
+                InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(stop_act.getWindowToken(), 0);
             }
         });
+
+
      /*   hm_location.put("Hall",new int[]{570,304});
         hm_location.put("Bedroom-1",new int[]{114,101});
         hm_location.put("Bedroom-2",new int[]{115,325});
