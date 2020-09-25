@@ -73,21 +73,17 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 400);
 
 
+/*
         //Test Multilateration
-      /*  double[] expectedCenter = new double[]{0, 0};
-        double[][] positions = new double[][]{{67, 56}, {0, 10}, {10, 0},{8,8} };
+        double[] expectedCenter = new double[]{0, 0};
+        double[][] positions = new double[][]{{0, 0}, {0, 10}, {10, 0} };
         double distance = 7.07106781;
-        double[] distances = new double[]{6.8, 5, 9.3,5.5};
-        double ent1=positions[0][0];
-        double ent2=positions[1][1];
-        //double ent3=positions[0][2];
-        Log.d("beacon","ent[0]="+ent1);
-        Log.d("beacon","ent[0]="+ent2);
-        //Log.d("beacon","ent[0]="+ent3);
+        double[] distances = new double[]{6, 8.7, 5.9};
         LeastSquaresOptimizer.Optimum optimum = Multilateration.findOptimum(positions, distances);
         double[] actualCenter = optimum.getPoint().toArray();
 
-         Log.d("beacon","actualCenter[0]="+actualCenter[0]+" actualCenter[1]="+actualCenter[1]);*/
+         Log.d("beacon","actualCenter[0]="+actualCenter[0]+" actualCenter[1]="+actualCenter[1]);
+*/
 
       //  findNearestPixel();
     }
@@ -128,10 +124,10 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Fragment selectedFragment = null;
         switch (item.getItemId()) {
-           /* case R.id.navigation_map: {
+            case R.id.navigation_map: {
                 selectedFragment = new BeaconMapFragment();
                 break;
-            }*/
+            }
             case R.id.navigation_radar: {
                 selectedFragment = new BeaconRadarFragment();
                 break;

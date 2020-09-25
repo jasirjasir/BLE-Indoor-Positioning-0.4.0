@@ -78,27 +78,47 @@
         <item>Kitchen</item>
         <item>Sitout</item>
     </string-array>-->
-    <string-array name="start_roomlist">
+<!--    <string-array name="start_roomlist">
         <item>Start</item>
         <item>My location</item>
-        <item>H-1</item>
-        <item>H-2</item>
-        <item>H-3</item>
-        <item>H-4</item>
-        <item>D-1</item>
-        <item>D-2</item>
-        <item>D-3</item>
-        <item>D-4</item>
+        <item>Hardware Lab1</item>
+        <item>Hardware Lab2</item>
+        <item>Hardware Lab3</item>
+        <item>Code Lab</item>
+        <item>Conference Room</item>
+
+    </string-array>-->
+    <string-array name="start_roomlist">
+        <item>Start</item>
+        <item>Entrance</item>
+        <item>A1C1</item><item>A1C2</item> <item>A1C3</item> <item>A1C4</item><item>A1C5</item><item>A1C6</item> <item>A1C7</item><item>A1C8</item>
+        <item>A2C1</item><item>A2C2</item><item>A2C3</item><item>A2C4</item>
+        <item>A3C1</item><item>A3C2</item><item>A3C3</item><item>A3C4</item>
+        <item>A4C1</item><item>A4C2</item><item>A4C3</item><item>A4C4</item><item>A4C5</item><item>A4C6</item>
+        <item>A5C1</item><item>A5C2</item><item>A5C3</item><item>A5C4</item><item>A5C5</item><item>A5C6</item>
+        <item>A6C1</item><item>A6C2</item><item>A6C3</item><item>A6C4</item><item>A6C5</item><item>A6C6</item>
+        <item>A7C1</item><item>A7C2</item><item>A7C3</item><item>A7C4</item><item>A7C5</item>
+        <item>A8C1</item><item>A8C2</item><item>A8C3</item><item>A8C4</item>
+        <item>A9C1</item><item>A9C2</item><item>A9C3</item><item>A9C4</item><item>A9C5</item>
+
+
+
+
     </string-array>
     <string-array name="stop_roomlist">
         <item>Stop</item>
-        <item>H-1</item>
-        <item>H-2</item>
-        <item>H-3</item>
-        <item>H-4</item>
-        <item>D-1</item>
-        <item>D-2</item>
-        <item>D-3</item>
-        <item>D-4</item>
+        <item>Entrance</item>
+        <item>A1C1</item><item>A1C2</item> <item>A1C3</item> <item>A1C4</item><item>A1C5</item><item>A1C6</item> <item>A1C7</item><item>A1C8</item>
+        <item>A2C1</item><item>A2C2</item><item>A2C3</item><item>A2C4</item>
+        <item>A3C1</item><item>A3C2</item><item>A3C3</item><item>A3C4</item>
+        <item>A4C1</item><item>A4C2</item><item>A4C3</item><item>A4C4</item><item>A4C5</item><item>A4C6</item>
+        <item>A5C1</item><item>A5C2</item><item>A5C3</item><item>A5C4</item><item>A5C5</item><item>A5C6</item>
+        <item>A6C1</item><item>A6C2</item><item>A6C3</item><item>A6C4</item><item>A6C5</item><item>A6C6</item>
+        <item>A7C1</item><item>A7C2</item><item>A7C3</item><item>A7C4</item><item>A7C5</item>
+        <item>A8C1</item><item>A8C2</item><item>A8C3</item><item>A8C4</item>
+        <item>A9C1</item><item>A9C2</item><item>A9C3</item><item>A9C4</item><item>A9C5</item>
     </string-array>
+    <string name="reset_path">
+          <u>Reset Path</u>
+    </string>
 </resources>

@@ -146,8 +146,8 @@ public class BluetoothClient {
                 beaconLocation.setAltitude(2);
                 beacon.setMajorId(iBeacon.getMajor());
                 beacon.setMinorId(iBeacon.getMinor());
-                beacon.setX(140);
-                beacon.setY(0);
+                beacon.setX(168);
+                beacon.setY(864);
                 beacon.setName("beacon1");
                 break;
             }
@@ -158,8 +158,8 @@ public class BluetoothClient {
                 beaconLocation.setAltitude(2);
                 beacon.setMajorId(iBeacon.getMajor());
                 beacon.setMinorId(iBeacon.getMinor());
-                beacon.setX(0);
-                beacon.setY(240);
+                beacon.setX(317);
+                beacon.setY(166);
                 beacon.setName("beacon2");
                 break;
             }
@@ -170,8 +170,8 @@ public class BluetoothClient {
                 beaconLocation.setAltitude(2);
                 beacon.setMajorId(iBeacon.getMajor());
                 beacon.setMinorId(iBeacon.getMinor());
-                beacon.setX(150);
-                beacon.setY(420);
+                beacon.setX(1141);
+                beacon.setY(234);
                 beacon.setName("beacon3");
                 break;
             }
@@ -182,8 +182,8 @@ public class BluetoothClient {
                 beaconLocation.setAltitude(2);
                 beacon.setMajorId(iBeacon.getMajor());
                 beacon.setMinorId(iBeacon.getMinor());
-                beacon.setX(550);
-                beacon.setY(190);
+                beacon.setX(1010);
+                beacon.setY(1238);
                 beacon.setName("beacon4");
                 break;
             }
@@ -193,9 +193,9 @@ public class BluetoothClient {
                 beaconLocation.setLongitude(76.35079766487668);
                 beaconLocation.setAltitude(2);
                 beacon.setMajorId(iBeacon.getMajor());
-                beacon.setMinorId(iBeacon.getMinor());
-                beacon.setX(320);
-                beacon.setY(420);
+               // beacon.setMinorId(iBeacon.getMinor());
+                beacon.setX(630);
+                beacon.setY(120);
                 beacon.setName("beacon5");
                 break;
             }
@@ -205,9 +205,9 @@ public class BluetoothClient {
                 beaconLocation.setLongitude(76.350797656767);
                 beaconLocation.setAltitude(2);
                 beacon.setMajorId(iBeacon.getMajor());
-                beacon.setMinorId(iBeacon.getMinor());
-                beacon.setX(520);
-                beacon.setY(580);
+               // beacon.setMinorId(iBeacon.getMinor());
+                beacon.setX(560);
+                beacon.setY(300);
                 beacon.setName("beacon6");
                 break;
             }
@@ -217,9 +217,9 @@ public class BluetoothClient {
                 beaconLocation.setLongitude(76.350797656767);
                 beaconLocation.setAltitude(2);
                 beacon.setMajorId(iBeacon.getMajor());
-                beacon.setMinorId(iBeacon.getMinor());
-                beacon.setX(412);
-                beacon.setY(225);
+               // beacon.setMinorId(iBeacon.getMinor());
+                beacon.setX(500);
+                beacon.setY(310);
                 beacon.setName("beacon7");
                 break;
             }
@@ -229,9 +229,9 @@ public class BluetoothClient {
                 beaconLocation.setLongitude(76.350797656767);
                 beaconLocation.setAltitude(2);
                 beacon.setMajorId(iBeacon.getMajor());
-                beacon.setMinorId(iBeacon.getMinor());
-                beacon.setX(38);
-                beacon.setY(400);
+                //beacon.setMinorId(iBeacon.getMinor());
+                beacon.setX(790);
+                beacon.setY(440);
                 beacon.setName("beacon8");
                 break;
             }
@@ -241,9 +241,9 @@ public class BluetoothClient {
                 beaconLocation.setLongitude(76.350797656767);
                 beaconLocation.setAltitude(2);
                 beacon.setMajorId(iBeacon.getMajor());
-                //beacon.setMinorId(iBeacon.getMinor());
-                beacon.setX(254);
-                beacon.setY(442);
+            //    beacon.setMinorId(iBeacon.getMinor());
+                beacon.setX(560);
+                beacon.setY(610);
                 beacon.setName("beacon9");
                 break;
             }
@@ -253,7 +253,7 @@ public class BluetoothClient {
                 beaconLocation.setLongitude(76.350797656767);
                 beaconLocation.setAltitude(2);
                 beacon.setMajorId(iBeacon.getMajor());
-                beacon.setMinorId(iBeacon.getMinor());
+               // beacon.setMinorId(iBeacon.getMinor());
                 beacon.setX(345);
                 beacon.setY(342);
                 beacon.setName("beacon10");
@@ -265,7 +265,7 @@ public class BluetoothClient {
                 beaconLocation.setLongitude(76.350797656767);
                 beaconLocation.setAltitude(2);
                 beacon.setMajorId(iBeacon.getMajor());
-                 beacon.setMinorId(iBeacon.getMinor());
+                // beacon.setMinorId(iBeacon.getMinor());
                 beacon.setX(345);
                 beacon.setY(342);
                 beacon.setName("beacon11");

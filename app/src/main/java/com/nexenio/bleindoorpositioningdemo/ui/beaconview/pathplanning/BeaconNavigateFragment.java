@@ -178,7 +178,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
                     for (int i =0; i < distances.size(); i++)
                         dis_arr[i]=distances.get(i);
 
-                   // Log.d("beacon","pos_arr="+pos_arr.length); 
+                   // Log.d("beacon","pos_arr="+pos_arr.length);
                   //  Log.d("beacon","dis_arr="+dis_arr.length);
                     LeastSquaresOptimizer.Optimum optimum = Multilateration.findOptimum(pos_arr, dis_arr);
                     double[] result_pos = optimum.getPoint().toArray();

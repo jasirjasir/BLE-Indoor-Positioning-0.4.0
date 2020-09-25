@@ -184,15 +184,15 @@ void setConstDataToBeacon(){
     // beacon 2
     beacon2.name="beacon2";
     beacon2.x_cord=0;
-    beacon2.y_cord=240;
+    beacon2.y_cord=300;
     beacon2.majorId=30179;
     beacon2.uuid=UUID;
     beacon2.floor=floor;
 
     // beacon 3
     beacon3.name="beacon3";
-    beacon3.x_cord=150;
-    beacon3.y_cord=420;
+    beacon3.x_cord=370;
+    beacon3.y_cord=300;
     beacon3.majorId=51907;
     beacon3.uuid=UUID;
     beacon3.floor=floor;
@@ -207,8 +207,8 @@ void setConstDataToBeacon(){
 
     // beacon 5
     beacon5.name="beacon5";
-    beacon5.x_cord=320;
-    beacon5.y_cord=420;
+    beacon5.x_cord=630;
+    beacon5.y_cord=120;
     beacon5.majorId=1356;
     beacon5.uuid=UUID;
     beacon5.floor=floor;
@@ -238,8 +238,8 @@ void setConstDataToBeacon(){
     beacon8.floor=floor;
     // beacon 9
     beacon9.name="beacon9";
-    beacon9.x_cord=254;
-    beacon9.y_cord=442;
+    beacon9.x_cord=560;
+    beacon9.y_cord=610;
     beacon9.majorId=30190;
     beacon9.uuid=UUID;
     beacon9.floor=floor;

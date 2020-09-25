@@ -42,7 +42,7 @@ public class BeaconMapFragment extends BeaconViewFragment {
             @Override
             public void onLocationUpdated(LocationProvider locationProvider, Location location) {
                 if (locationProvider instanceof IndoorPositioning) {
-                    beaconMap.setDeviceLocation(location);
+                   beaconMap.setDeviceLocation(location);
                     beaconMap.setPredictedDeviceLocation(IndoorPositioning.getLocationPredictor().getLocation());
                     beaconMap.fitToCurrentLocations();
                     Log.d("beacon","Location updated after trilateration");
@@ -74,7 +74,7 @@ public class BeaconMapFragment extends BeaconViewFragment {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
-        Bitmap backgroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.newhome, options);
+        Bitmap backgroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_office, options);
 
         Location firstReferenceLocation = new Location(10.019895668819222, 76.35076547277124);
         Location secondReferenceLocation = new Location(10.019932007511654, 76.35075204170859);
