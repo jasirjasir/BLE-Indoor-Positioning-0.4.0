@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -51,6 +52,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
     Canvas tempCanvas,path_canvas;
     Paint paint =new Paint();
     ImageView mImageView;
+    TextView tv_reset;
     private SensorEventListener sensorEventListener;
     private SensorManager sensorManager;
     private final float[] accelerometerReading = new float[3];
@@ -77,8 +79,9 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
     int [] output_coordinates=null;
     private double[] localized_position =null;
   //  double[][] coordinate_list=new double[][]{{570,304},{114,101},{115,325},{782,406},{460,73},{292,625}};
-    double[][] coordinate_list=new double[][]{{81,107},{284,107},{81,393},{273,393},{380,153},{557,153},{376,541},{540,541  }};
+    double[][] coordinate_list=new double[][]{{22,89},{187,327},{187,572},{573,215},{573,518}};
     double[][] digkistra_coordinates=null;
+    boolean isNear=false;
     public BeaconNavigateFragment() {
         super();
         //uncomment to add uuid filter
@@ -113,10 +116,10 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-       // sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-      //  sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-     //   sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
-      //  sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
+       //   sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+       //   sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+      //    sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
+      //    sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
 
     }
 
@@ -154,7 +157,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
                         sb.append("~MINOR_ID:" + beacon.getMinorId());
                         sb.append("~RSSI:" + beacon.getRssi());
                         sb.append("~DISTANCE:" + beacon.getDistance()*100*.8);
-
+                        //Log.d(LOGTAG,"beacon name="+beacon.getName()+"   Distance = "+beacon.getDistance());
 
                         //addded for multilateration
                         locations.add(new double[][]{{Double.valueOf(beacon.getX()), Double.valueOf(beacon.getY())}});
@@ -175,20 +178,33 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
                     for (int i =0; i < distances.size(); i++)
                         dis_arr[i]=distances.get(i);
 
-                   // Log.d("beacon","pos_arr="+pos_arr.length);
+                   // Log.d("beacon","pos_arr="+pos_arr.length); 
                   //  Log.d("beacon","dis_arr="+dis_arr.length);
                     LeastSquaresOptimizer.Optimum optimum = Multilateration.findOptimum(pos_arr, dis_arr);
                     double[] result_pos = optimum.getPoint().toArray();
                     addTolist(result_pos);
-                    if (x_list.size()>=5) {
+                    if (x_list.size()>=10) {
                         localized_position =calculateAverageVal();
+                        Log.d("beacon", "localized_position X= "+(int)localized_position[0]+"   -Y= "+(int)localized_position[1]);
                         if(output_coordinates!=null){
+                            Log.d("beacon", "output_coordinates not null");
                             double[] result= findNearestPixel(result_pos,digkistra_coordinates);
-                            if (result[2]<100.0) drawPoint(3 * (int) result[0], 3 * (int) result[1]);
+                            if (input_cordinates!=null && !isNear) {
+                                double dis= DisatanceToDestination(result_pos,new int[]{input_cordinates[2],input_cordinates[3]});
+                                if(dis<200) {
+                                    Toast.makeText(getActivity().getApplicationContext(), "You are "+String.format("%.2f", dis/100)+" meter away from destination !!", Toast.LENGTH_SHORT).show();
+                                    isNear=true;
+                                }
+
+                            }
+                            if (result[2]<200.0) drawPoint(3 * (int) result[0], 3 * (int) result[1]);
                             else   drawPoint(3 * (int) localized_position[0], 3 * (int) localized_position[1]);
 
-                        }else
+                        }else{
+                            Log.d("beacon", "output_coordinates is  null");
                             drawPoint(3 * (int) localized_position[0], 3 * (int) localized_position[1]);
+                        }
+
 
                         x_list.clear();
                         y_list.clear();
@@ -238,6 +254,9 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
        }
         };
     }
+
+
+
     public void addTolist(double []array){
 
         x_list.add((int) array[0]);
@@ -269,10 +288,10 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("beacon","-----view created--------- ");
-        myBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.newhome1);
+        myBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.second_floor_plan);
         options.inScaled = false;
-        bmp_mono=BitmapFactory.decodeResource(getResources(), R.drawable.newhome_mono, options);
-
+        bmp_mono=BitmapFactory.decodeResource(getResources(), R.drawable.second_floor_route, options);
+        tv_reset=(TextView)getView().findViewById(R.id.reset_path);
         //tempCanvas.drawBitmap(myBitmap, 0, 0, null);
        // paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
@@ -306,6 +325,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
                        Toast.makeText(getActivity().getApplicationContext(), "Could not read your current location !!", Toast.LENGTH_SHORT).show();
                    }
                 }else{
+                    isNear=false;
                     input_cordinates=new int[]{hm_location.get(start_loc)[0],hm_location.get(start_loc)[1],hm_location.get(stop_loc)[0],hm_location.get(stop_loc)[1]};
                     performNavigation(input_cordinates);
                 }
@@ -314,7 +334,18 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
             }
         });
 
+        tv_reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getActivity().getApplicationContext(), "Path reset", Toast.LENGTH_SHORT).show();
+                 output_coordinates=null;
+                 digkistra_coordinates=null;
+                 copy_bmp=null;
+                 mImageView.setImageDrawable(new BitmapDrawable(getResources(), myBitmap));
 
+
+            }
+        });
 
     }
     public double[] findNearestPixel(double[] position, double[][] list){
@@ -323,12 +354,18 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
         for (double[] pos: list){
             distances.add(Math.sqrt(Math.pow((pos[0]-position[0]),2)+Math.pow((pos[1]-position[1]),2)));
         }
+        //Log.d("beacon","minimum value ="+Collections.min(distances));
         int indexOfMinimum = distances.indexOf(Collections.min(distances));
-        Log.d("beacon","nearest co-ordinate at ="+indexOfMinimum);
-        Log.d("beacon","distance ="+distances.get(indexOfMinimum));
+        //Log.d("beacon","nearest co-ordinate at ="+indexOfMinimum);
+        //Log.d("beacon","distance ="+distances.get(indexOfMinimum));
 
         return new double[] {list[indexOfMinimum][0],list[indexOfMinimum][1],distances.get(indexOfMinimum)};
 
+    }
+
+    private double DisatanceToDestination(double[] source, int[] destination) {
+
+        return Math.sqrt(Math.pow((destination[0]-source[0]),2)+Math.pow((destination[1]-source[1]),2));
     }
 
     private void performNavigation(int[] input_coordinates) {
@@ -346,7 +383,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
                 }
                 drawRoute(arr);
                 double distance_to_travel = (output_coordinates.length / 2) / 100.0;
-                Toast.makeText(getActivity().getApplicationContext(), "Distance to travel= " + distance_to_travel + " meter", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(), "Distance to travel= " + (int)distance_to_travel + " meter", Toast.LENGTH_SHORT).show();
                 for (int i = 0; i < (output_coordinates.length - 2); i += 2) {
                     digkistra_coordinates[i / 2][0] = output_coordinates[i];
                     digkistra_coordinates[i / 2][1] = output_coordinates[i + 1];
@@ -395,7 +432,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
         hm_location.put("Bedroom-2",new int[]{115,325});
         hm_location.put("Bedroom-3",new int[]{782,406});
         hm_location.put("Kitchen",new int[]{460,73});
-        hm_location.put("Sitout",new int[]{292,625});*/
+        hm_location.put("Sitout",new int[]{292,625});
         hm_location.put("H-1",new int[]{81,107});
         hm_location.put("H-2",new int[]{284,107});
         hm_location.put("H-3",new int[]{81,393});
@@ -403,7 +440,73 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
         hm_location.put("D-1",new int[]{380,153});
         hm_location.put("D-2",new int[]{557,153});
         hm_location.put("D-3",new int[]{376,541});
-        hm_location.put("D-4",new int[]{540,541});
+        hm_location.put("D-4",new int[]{540,541});*/
+        hm_location.put("Hardware Lab1",new int[]{22,89});
+        hm_location.put("Hardware Lab2",new int[]{187,327});
+        hm_location.put("Hardware Lab3",new int[]{187,572});
+        hm_location.put("Code Lab",new int[]{573,215});
+        hm_location.put("Conference Room",new int[]{573,518});
+
+
+        hm_location.put("Entrance",new int[]{17,977});
+        hm_location.put("A1C1",new int[]{414,784});
+        hm_location.put("A1C2",new int[]{290,784});
+        hm_location.put("A1C3",new int[]{168,784});
+        hm_location.put("A1C4",new int[]{56,784});
+        hm_location.put("A1C5",new int[]{56,694});
+        hm_location.put("A1C6",new int[]{168,694});
+        hm_location.put("A1C7",new int[]{290,694});
+        hm_location.put("A1C8",new int[]{416,694});
+
+        hm_location.put("A2C1",new int[]{137,240});
+        hm_location.put("A2C2",new int[]{135,117});
+        hm_location.put("A2C3",new int[]{218,116});
+        hm_location.put("A2C4",new int[]{220,240});
+
+        hm_location.put("A3C1",new int[]{470,239});
+        hm_location.put("A3C2",new int[]{470,112});
+        hm_location.put("A3C3",new int[]{557,112});
+        hm_location.put("A3C4",new int[]{558,238});
+
+        hm_location.put("A4C1",new int[]{873,78});
+        hm_location.put("A4C2",new int[]{987,78});
+        hm_location.put("A4C3",new int[]{1105,76});
+        hm_location.put("A4C4",new int[]{1107,164});
+        hm_location.put("A5C5",new int[]{989,165});
+        hm_location.put("A5C6",new int[]{870,164});
+
+        hm_location.put("A5C1",new int[]{870,313});
+        hm_location.put("A5C2",new int[]{985,308});
+        hm_location.put("A5C3",new int[]{1107,308});
+        hm_location.put("A5C4",new int[]{1107,392});
+        hm_location.put("A5C5",new int[]{983,395});
+        hm_location.put("A5C6",new int[]{869,394});
+
+
+        hm_location.put("A6C1",new int[]{875,553});
+        hm_location.put("A6C2",new int[]{986,550});
+        hm_location.put("A6C3",new int[]{1107,550});
+        hm_location.put("A6C4",new int[]{1107,637});
+        hm_location.put("A6C5",new int[]{983,637});
+        hm_location.put("A6C6",new int[]{867,634});
+
+        hm_location.put("A7C1",new int[]{866,782});
+        hm_location.put("A7C2",new int[]{987,783});
+        hm_location.put("A7C3",new int[]{1106,782});
+        hm_location.put("A7C4",new int[]{1105,871});
+        hm_location.put("A7C5",new int[]{988,866});
+
+        hm_location.put("A8C1",new int[]{985,1049});
+        hm_location.put("A8C2",new int[]{1105,1043});
+        hm_location.put("A8C3",new int[]{1106,1129});
+        hm_location.put("A8C4",new int[]{987,1135});
+
+        hm_location.put("A9C1",new int[]{989,1291});
+        hm_location.put("A9C2",new int[]{1106,1293});
+        hm_location.put("A9C3",new int[]{1109,1379});
+        hm_location.put("A9C4",new int[]{989,1377});
+        hm_location.put("A9C5",new int[]{836,1367});
+
 
     }
 
