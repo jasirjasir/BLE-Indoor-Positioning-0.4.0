@@ -19,7 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
-import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -37,9 +37,14 @@ import com.nexenio.bleindoorpositioningdemo.ui.beaconview.BeaconViewFragment;
 import com.nexenio.bleindoorpositioningdemo.ui.beaconview.CvUtil;
 
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,6 +57,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
     Bitmap myBitmap,tempBitmap,path_bitmap;
     Canvas tempCanvas,path_canvas;
     Paint paint =new Paint();
+    Paint paintOut = new Paint();
     ImageView mImageView;
     private SensorEventListener sensorEventListener;
     private SensorManager sensorManager;
@@ -63,6 +69,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
     List<String[]> beacon_data_list;
     ArrayList<String> list;
     String start_loc,stop_loc;
+    String[] start_locations=null,stop_locations=null;
     AutoCompleteTextView start_act,stop_act;
     HashMap<String,int[]> hm_location=new HashMap<String, int[]>();
     BitmapFactory.Options options = new BitmapFactory.Options();
@@ -79,8 +86,9 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
     int [] output_coordinates=null;
     private double[] localized_position =null;
   //  double[][] coordinate_list=new double[][]{{570,304},{114,101},{115,325},{782,406},{460,73},{292,625}};
-    double[][] coordinate_list=new double[][]{{81,107},{284,107},{81,393},{273,393},{380,153},{557,153},{376,541},{540,541  }};
+    double[][] coordinate_list;
     double[][] digkistra_coordinates=null;
+    TextView tv_reset;
     public BeaconNavigateFragment() {
         super();
         //uncomment to add uuid filter
@@ -128,9 +136,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
             @Override
             public void onLocationUpdated(LocationProvider locationProvider, Location location) {
                 // TODO: remove artificial noise
-                //location.setLatitude(location.getLatitude() + Math.random() * 0.0002);
-                //location.setLongitude(location.getLongitude() + Math.random() * 0.0002);
-               // beaconChart.setDeviceLocation(location);
+
             }
         };
     }
@@ -160,7 +166,8 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
 
                         //addded for multilateration
                         locations.add(new double[][]{{Double.valueOf(beacon.getX()), Double.valueOf(beacon.getY())}});
-                        distances.add((beacon.getDistance()*100*.9));
+                        distances.add((Math.sqrt(Math.abs(Math.pow(beacon.getDistance()*100,2)-Math.pow(1.5*100,2)))));
+                        //distances.add((beacon.getDistance()*100*.9));
                     }
                    // Log.d(LOGTAG,"distance ="+beacon.getDistance());
                 }
@@ -181,12 +188,13 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
                   //  Log.d("beacon","dis_arr="+dis_arr.length);
                     LeastSquaresOptimizer.Optimum optimum = Multilateration.findOptimum(pos_arr, dis_arr);
                     double[] result_pos = optimum.getPoint().toArray();
+
                     addTolist(result_pos);
                     if (x_list.size()>=5) {
                         localized_position =calculateAverageVal();
                         if(output_coordinates!=null){
                             double[] result= findNearestPixel(result_pos,digkistra_coordinates);
-                            if (result[2]<100.0) drawPoint(3 * (int) result[0], 3 * (int) result[1]);
+                            if (result[2]<200.0) drawPoint(3 * (int) result[0], 3 * (int) result[1]);
                             else   drawPoint(3 * (int) localized_position[0], 3 * (int) localized_position[1]);
 
                         }else
@@ -199,44 +207,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
                 }
                 locations.clear();
                 distances.clear();
-              //Trilateration
-             /*   if(beacon_count>=3) {
 
-                    // Log.d(LOGTAG,sb.toString());
-                    int[] cordArray= CvUtil.SendData_string(sb.toString());
-                    if (cordArray!=null){
-                       // Log.d("beacon", "coordinates received in java x="+cordArray[0]+" y="+cordArray[1]);
-                        //multiply each coordinate by 3 for scaling properly
-                        addTolist(cordArray);
-                        if (x_list.size()>=10) {
-                            double[] result=calculateAverageVal();
-                           // Log.d("beacon","result[0]="+result[0]+"  result[1]="+result[1]);
-                            drawPoint(3 * (int)result[0], 3 * (int)result[1]);
-                            x_list=new ArrayList<>();
-                            y_list=new ArrayList<>();
-                        }
-
-
-                      // Adding data to csv file
-                        list.add(String.valueOf(cordArray[0]));
-                        list.add(String.valueOf(cordArray[1]));
-                        //Adding IMU data to CSV
-                        list.add(String.valueOf(accelerometerReading[0])+","+String.valueOf(accelerometerReading[1])+","+String.valueOf(accelerometerReading[2]));
-                        list.add(String.valueOf(gyroscopeReading[0])+","+String.valueOf(gyroscopeReading[1])+","+String.valueOf(gyroscopeReading[2]));
-                        list.add(String.valueOf(magnetometerReading[0])+","+String.valueOf(magnetometerReading[1])+","+String.valueOf(magnetometerReading[2]));
-
-                        // beacon_data_list.add(new String[]{"Trilateration","", "" ,"",String.valueOf(cordArray[0]),String.valueOf(cordArray[1])});
-                        String[] tempArray=list.toArray(new String[list.size()]);
-                        beacon_data_list.add(tempArray);
-                       // writer.writeAll(beacon_data_list);
-                        beacon_data_list.clear();
-                        list.clear();
-                    }
-                }
-                else {
-                    beacon_data_list.clear();
-                    list.clear();
-                }*/
        }
         };
     }
@@ -271,16 +242,17 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("beacon","-----view created--------- ");
-        myBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.newhome1);
+        myBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.gadgeon_sec);
         options.inScaled = false;
-        bmp_mono=BitmapFactory.decodeResource(getResources(), R.drawable.newhome_mono, options);
-
-        //tempCanvas.drawBitmap(myBitmap, 0, 0, null);
-       // paint = new Paint();
+        bmp_mono=BitmapFactory.decodeResource(getResources(), R.drawable.gadgeon_sec_mono, options);
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.RED);
+        paint.setColor(getResources().getColor(R.color.md_red_900));
         paint.setAntiAlias(true);
+        paintOut.setStyle(Paint.Style.FILL);
+        paintOut.setColor(getResources().getColor(R.color.md_red_A700_trans));
+        paintOut.setAntiAlias(true);
         mImageView=(ImageView)getView().findViewById(R.id.plan);
+        tv_reset=(TextView)getView().findViewById(R.id.reset_path);
         Log.d("beacon","view created ");
         tempBitmap = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.RGB_565);
         path_bitmap = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.RGB_565);
@@ -291,7 +263,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
         ImageView Go_button= (ImageView)getView().findViewById(R.id.go_button);
         start_act = (AutoCompleteTextView) getView().findViewById(R.id.start_act);
         stop_act = (AutoCompleteTextView)getView().findViewById(R.id.stop_act);
-        SetItemstoView(); //set spinner data
+        SetSpinnerData(); //set spinner data
         Go_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -316,6 +288,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
                         Toast.makeText(getContext(), "Enter valid location", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     }
+                    Log.d("beacon",LOGTAG+input_cordinates);
                     performNavigation(input_cordinates);
                 }
 
@@ -323,7 +296,20 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
             }
         });
 
+        tv_reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getActivity().getApplicationContext(), "Path reset", Toast.LENGTH_SHORT).show();
+               if(output_coordinates!=null) {
+                    output_coordinates = null;
+                    digkistra_coordinates = null;
+                    copy_bmp = null;
+                   // mImageView.setImageDrawable(new BitmapDrawable(getResources(), myBitmap));
+                    mImageView.setImageResource(R.drawable.gadgeon_sec);
+                }
 
+            }
+        });
 
     }
     public double[] findNearestPixel(double[] position, double[][] list){
@@ -369,9 +355,10 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
 
     }
 
-    private void SetItemstoView() {
-        ArrayAdapter<String> start_adapter = new ArrayAdapter<>( getActivity(), R.layout.custom_spinner,getResources().getStringArray(R.array.start_roomlist));
-        ArrayAdapter<String> stop_adapter = new ArrayAdapter<>( getActivity(), R.layout.custom_spinner,getResources().getStringArray(R.array.stop_roomlist));
+    private void SetSpinnerData() {
+        getLocationFromJSON();
+        ArrayAdapter<String> start_adapter = new ArrayAdapter<>( getActivity(), R.layout.custom_spinner,start_locations);
+        ArrayAdapter<String> stop_adapter = new ArrayAdapter<>( getActivity(), R.layout.custom_spinner,stop_locations);
         start_adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown);
         stop_adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown);
         start_act.setThreshold(1);
@@ -400,21 +387,47 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
         });
 
 
-     /*   hm_location.put("Hall",new int[]{570,304});
-        hm_location.put("Bedroom-1",new int[]{114,101});
-        hm_location.put("Bedroom-2",new int[]{115,325});
-        hm_location.put("Bedroom-3",new int[]{782,406});
-        hm_location.put("Kitchen",new int[]{460,73});
-        hm_location.put("Sitout",new int[]{292,625});*/
-        hm_location.put("H-1",new int[]{81,107});
-        hm_location.put("H-2",new int[]{284,107});
-        hm_location.put("H-3",new int[]{81,393});
-        hm_location.put("H-4",new int[]{273,393});
-        hm_location.put("D-1",new int[]{380,153});
-        hm_location.put("D-2",new int[]{557,153});
-        hm_location.put("D-3",new int[]{376,541});
-        hm_location.put("D-4",new int[]{540,541});
+    }
+    private void getLocationFromJSON() {
+        try {
+            JSONObject obj = new JSONObject(loadJSONFromAsset("cubicles.json"));
+            JSONArray m_jArry = obj.getJSONArray("locations");
+            start_locations=new String[m_jArry.length()+1];
+            stop_locations=new String[m_jArry.length()];
+            start_locations[0]="My location";
+            coordinate_list=new double[m_jArry.length()][2];
+            for (int i = 0; i < m_jArry.length(); i++) {
+                JSONObject jo_inside = m_jArry.getJSONObject(i);
+                Log.d("ID-->", "" + jo_inside.getString("Cubicle"));
+                String cubicle = jo_inside.getString("Cubicle");
+                int X = jo_inside.getInt("X");
+                int Y = jo_inside.getInt("Y");
 
+                //Add your values in your `ArrayList` as below:
+                hm_location.put(cubicle,new int[]{X, Y});
+                start_locations[i+1]=cubicle;
+                stop_locations[i]=cubicle;
+                coordinate_list[i][0]=X;
+                coordinate_list[i][1]=Y;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    private String loadJSONFromAsset(String fileName) {
+        String json = null;
+        try {
+            InputStream is = getActivity().getAssets().open(fileName);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
     }
 
     private void drawPoint(int x,int y) {
@@ -435,7 +448,9 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
          }
 
         tempCanvas.drawCircle(x ,y,50,paint);
-         mImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
+        tempCanvas.drawCircle(x, y, 100, paintOut);
+
+        mImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
     }
     private void drawRoute(float [] array) {
 

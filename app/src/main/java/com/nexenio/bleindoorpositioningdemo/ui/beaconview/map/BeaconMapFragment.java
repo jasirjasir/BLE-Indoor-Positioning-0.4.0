@@ -74,7 +74,7 @@ public class BeaconMapFragment extends BeaconViewFragment {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
-        Bitmap backgroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.newhome, options);
+        Bitmap backgroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.gadgeon_sec_mono, options);
 
         Location firstReferenceLocation = new Location(10.019895668819222, 76.35076547277124);
         Location secondReferenceLocation = new Location(10.019932007511654, 76.35075204170859);

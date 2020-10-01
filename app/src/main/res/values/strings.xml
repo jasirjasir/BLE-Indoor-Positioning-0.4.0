@@ -59,25 +59,7 @@
     <string name="error_location_disabled">Location services disabled</string>
     <string name="error_bluetooth_disabled">Bluetooth disabled</string>
     <string name="action_enable">Enable</string>
-  <!--  <string-array name="start_roomlist">
-    <item>Start</item>
-    <item>My location</item>
-    <item>Hall</item>
-    <item>Bedroom-1</item>
-    <item>Bedroom-2</item>
-    <item>Bedroom-3</item>
-    <item>Kitchen</item>
-    <item>Sitout</item>
-</string-array>
-    <string-array name="stop_roomlist">
-        <item>Stop</item>
-        <item>Hall</item>
-        <item>Bedroom-1</item>
-        <item>Bedroom-2</item>
-        <item>Bedroom-3</item>
-        <item>Kitchen</item>
-        <item>Sitout</item>
-    </string-array>-->
+<!--
     <string-array name="start_roomlist">
         <item>Start</item>
         <item>My location</item>
@@ -100,9 +82,12 @@
         <item>D-2</item>
         <item>D-3</item>
         <item>D-4</item>
-    </string-array>
+    </string-array>-->
 
     <string name="start_txt">Start</string>
     <string name="stop_txt">Stop</string>
     <string name="indoor_navigation">Indoor Navigation</string>
+    <string name="reset_path">
+          <u>Reset Path</u>
+    </string>
 </resources>

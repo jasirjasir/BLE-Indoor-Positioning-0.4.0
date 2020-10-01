@@ -22,16 +22,24 @@ import android.view.WindowManager;
 
 import com.nexenio.bleindoorpositioning.location.Location;
 import com.nexenio.bleindoorpositioning.location.multilateration.Multilateration;
+import com.nexenio.bleindoorpositioningdemo.bluetooth.BeaconLoc;
+import com.nexenio.bleindoorpositioningdemo.bluetooth.BeaconStore;
 import com.nexenio.bleindoorpositioningdemo.bluetooth.BluetoothClient;
 import com.nexenio.bleindoorpositioningdemo.location.AndroidLocationProvider;
 import com.nexenio.bleindoorpositioningdemo.ui.beaconview.chart.BeaconChartFragment;
 import com.nexenio.bleindoorpositioningdemo.ui.beaconview.map.BeaconMapFragment;
 import com.nexenio.bleindoorpositioningdemo.ui.beaconview.pathplanning.BeaconNavigateFragment;
+import com.nexenio.bleindoorpositioningdemo.ui.beaconview.pathplanning.SensorEventFragment;
 import com.nexenio.bleindoorpositioningdemo.ui.beaconview.radar.BeaconRadarFragment;
 
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.opencv.android.OpenCVLoader;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -56,8 +64,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Log.d(TAG, "App started");
@@ -67,6 +74,8 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         /*bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         bottomNavigationView.setSelectedItemId(R.id.navigation_radar);*/
+        //set beacon locations
+        BeaconStore.setBeaconArrayList(getBeaconsFromJSON());
 
         // setup locationc
         AndroidLocationProvider.initialize(this);
@@ -80,7 +89,48 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
 
         getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new BeaconNavigateFragment()).commit();
     }
+    private ArrayList<BeaconLoc> getBeaconsFromJSON() {
+        ArrayList<BeaconLoc> vBeaconLocArrayList = new ArrayList<>();
+        try {
+            JSONObject obj = new JSONObject(loadJSONFromAsset("beacons.json"));
+            JSONArray m_jArry = obj.getJSONArray("beacon");
 
+            for (int i = 0; i < m_jArry.length(); i++) {
+                JSONObject jo_inside = m_jArry.getJSONObject(i);
+                Log.d("ID-->", "" + jo_inside.getInt("id"));
+                int id = jo_inside.getInt("id");
+                int ky = jo_inside.getInt("ky");
+                int kx = jo_inside.getInt("kx");
+                int minor = jo_inside.getInt("minor");
+                int major = jo_inside.getInt("major");
+                String uuid = jo_inside.getString("uuid");
+                String name = jo_inside.getString("name");
+
+                //Add your values in your `ArrayList` as below:
+                vBeaconLocArrayList.add(new BeaconLoc(id, ky, kx, minor, major, uuid, name));
+            }
+            return vBeaconLocArrayList;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String loadJSONFromAsset(String fileName) {
+        String json = null;
+        try {
+            InputStream is = HomeActivity.this.getAssets().open(fileName);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
+    }
     private void GetLocation() {
         // Step 1: Outdoor reference location
         double measuredLatitude = 10.019895668819222;
