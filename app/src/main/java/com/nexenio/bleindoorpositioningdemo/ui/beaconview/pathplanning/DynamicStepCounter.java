@@ -49,12 +49,12 @@ public class DynamicStepCounter {
         //set the thresholds that are used to find the peaks
 //        setThresholdsDiscreet(acc);
         setThresholdsContinuous(acc);
-        Log.d("StepCounter", "Acc: " + acc);
-        Log.d("StepCounter", "upperThreshold: " + upperThreshold);
-        Log.d("StepCounter", "peakFound: " + peakFound);
+        //Log.d("StepCounter", "Acc: " + acc);
+        //Log.d("StepCounter", "upperThreshold: " + upperThreshold);
+        //Log.d("StepCounter", "peakFound: " + peakFound);
         //finds a point (peak) above the upperThreshold
         if (acc > upperThreshold) {
-            Log.d("StepCounter", "acc > upperThreshold ");
+            //Log.d("StepCounter", "acc > upperThreshold ");
 
             if (!peakFound) {
                 stepCount++;

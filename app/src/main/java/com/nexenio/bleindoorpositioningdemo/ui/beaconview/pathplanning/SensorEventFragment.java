@@ -66,7 +66,7 @@ public class SensorEventFragment extends Fragment implements SensorEventListener
     ArrayList<Integer> beaconPoseList_X = new ArrayList<Integer>();
     ArrayList<Integer> beaconPoseList_Y=new ArrayList<Integer>();
     TextView tv1,tv2;
-
+    private boolean stepDetector=true;
 
     public SensorEventFragment() {
         // Required empty public constructor
@@ -150,10 +150,19 @@ public class SensorEventFragment extends Fragment implements SensorEventListener
         if (magneticField != null) {
             sensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_FASTEST);
         }
-        Sensor linearAccelaration = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        if (linearAccelaration != null) {
-            sensorManager.registerListener(this, linearAccelaration, SensorManager.SENSOR_DELAY_FASTEST);
+        if (stepDetector) {
+            Sensor step_Detector = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+            if(step_Detector != null) {
+                sensorManager.registerListener(this, step_Detector, SensorManager.SENSOR_DELAY_FASTEST);
+            }
+        } else {
+            Sensor linearAccelaration = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+            if (linearAccelaration != null) {
+                sensorManager.registerListener(this, linearAccelaration, SensorManager.SENSOR_DELAY_FASTEST);
+//                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+            }
         }
+
 
     }
 
@@ -198,6 +207,33 @@ public class SensorEventFragment extends Fragment implements SensorEventListener
 
                 Log.d("onSensorChanged ", "Sensor_Pose: (x, y) = " + rPointX + ", " + rPointY + ", heading: " + heading);
                 tv1.setText("Sensor_Pose: (x, y) = " + rPointX + " , " + rPointY + "\n heading: " + heading);
+
+
+                DRPose[0] = rPointX;
+                DRPose[1] = rPointY;
+
+                updatePosition = true;
+                positionUpdateTime = SystemClock.elapsedRealtime();
+
+            }
+            else {
+                DRPose = estimatedPose;
+            }
+
+        }
+        else if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
+
+            Log.d("onSensorChanged", "Step detector: " + sensorEvent.values[0] );
+
+            boolean stepFound = (sensorEvent.values[0] == 1);
+            if (stepFound) {
+//                Log.d("onSensorChanged ", " estimatedPose: (" + estimatedPose[0] + ", " + estimatedPose[1] + ")" );
+
+                float rPointX = (float) (estimatedPose[0] - STRIDE_LENGTH * Math.sin(heading) );
+                float rPointY = (float) (estimatedPose[1] + STRIDE_LENGTH * Math.cos(heading) );
+
+                // Log.d("onSensorChanged ", "Sensor_Pose: (x, y) = " + rPointX + ", " + rPointY + ", heading: " + heading);
+                // tv1.setText("Sensor_Pose: (x, y) = " + rPointX + " , " + rPointY + "\n heading: " + heading);
 
 
                 DRPose[0] = rPointX;

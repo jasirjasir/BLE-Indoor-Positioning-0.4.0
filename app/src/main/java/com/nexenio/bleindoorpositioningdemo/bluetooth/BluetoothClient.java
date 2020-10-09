@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.nexenio.bleindoorpositioning.ble.advertising.AdvertisingPacket;
 import com.nexenio.bleindoorpositioning.ble.beacon.Beacon;
@@ -13,6 +14,7 @@ import com.nexenio.bleindoorpositioning.ble.beacon.BeaconManager;
 import com.nexenio.bleindoorpositioning.ble.beacon.IBeacon;
 import com.nexenio.bleindoorpositioning.location.Location;
 import com.nexenio.bleindoorpositioning.location.provider.IBeaconLocationProvider;
+import com.nexenio.bleindoorpositioningdemo.ui.beaconview.pathplanning.BeaconNavigateFragment;
 import com.polidea.rxandroidble.RxBleClient;
 import com.polidea.rxandroidble.scan.ScanResult;
 import com.polidea.rxandroidble.scan.ScanSettings;
@@ -25,6 +27,7 @@ import rx.Subscription;
  * Created by steppschuh on 24.11.17.
  */
 
+
 public class BluetoothClient {
 
     private static final String TAG = "beacon";//BluetoothClient.class.getSimpleName();
@@ -32,7 +35,7 @@ public class BluetoothClient {
 
     private static BluetoothClient instance;
 
-    private Context context;
+    public static Context mContext;
     private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
     private BeaconManager beaconManager = BeaconManager.getInstance();
@@ -40,9 +43,11 @@ public class BluetoothClient {
     private RxBleClient rxBleClient;
     private Subscription scanningSubscription;
 
-    private BluetoothClient() {
+
+    public BluetoothClient() {
 
     }
+
 
     public static BluetoothClient getInstance() {
         if (instance == null) {
@@ -53,6 +58,7 @@ public class BluetoothClient {
 
     public static void initialize(@NonNull Context context) {
         Log.v(TAG, "Initializing with context: " + context);
+        mContext = context;
         BluetoothClient instance = getInstance();
         instance.rxBleClient = RxBleClient.create(context);
         instance.bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
@@ -134,7 +140,7 @@ public class BluetoothClient {
         }
     }
 
-    private static IBeaconLocationProvider<IBeacon> createDebuggingLocationProvider(IBeacon iBeacon, Beacon beacon) {
+    public static   IBeaconLocationProvider<IBeacon> createDebuggingLocationProvider(IBeacon iBeacon, Beacon beacon) {
         final Location beaconLocation = new Location();
 
         try {
@@ -147,13 +153,14 @@ public class BluetoothClient {
             beacon.setName(vBeaconLoc.getName());
             beaconLocation.setLatitude(10.0199105668819222);
             beaconLocation.setLongitude(76.35076967277124);
-        } catch (NullPointerException e) {
+            Toast.makeText(mContext,"Registering  "+vBeaconLoc.getName(),Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
             Log.d("beacon","Errorr while registering beacon :  " + iBeacon.getMinor());
-            if (iBeacon.getMinor()==80){
-                beaconLocation.setLatitude(10.0199105668819222);
-                beaconLocation.setLongitude(76.35076967277124);
+          //  if (iBeacon.getMinor()==80){
+                beaconLocation.setLatitude(10.0);
+                beaconLocation.setLongitude(10.0);
                 Log.d("beacon","Load dummy data due to noise ");
-            }
+           // }
             e.printStackTrace();
         }
 

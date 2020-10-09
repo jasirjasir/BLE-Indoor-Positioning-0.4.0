@@ -6,18 +6,22 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +37,9 @@ import com.nexenio.bleindoorpositioning.location.LocationListener;
 import com.nexenio.bleindoorpositioning.location.multilateration.Multilateration;
 import com.nexenio.bleindoorpositioning.location.provider.LocationProvider;
 import com.nexenio.bleindoorpositioningdemo.R;
+import com.nexenio.bleindoorpositioningdemo.bluetooth.BeaconLoc;
+import com.nexenio.bleindoorpositioningdemo.bluetooth.BeaconStore;
+import com.nexenio.bleindoorpositioningdemo.bluetooth.BluetoothClient;
 import com.nexenio.bleindoorpositioningdemo.ui.beaconview.BeaconViewFragment;
 import com.nexenio.bleindoorpositioningdemo.ui.beaconview.CvUtil;
 
@@ -89,6 +96,21 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
     double[][] coordinate_list;
     double[][] digkistra_coordinates=null;
     TextView tv_reset;
+    CheckBox beacon_show;
+   // Indu chechi changes
+   private double heading;
+   private DynamicStepCounter dynamicStepCounter;
+    private float[] estimatedPose = new float[2];
+    private float errorCovariance;
+    private long positionUpdateTime;
+    private long sensorStartTime;
+    private final float[] rotationMatrix = new float[9];
+    private final float[] linAccReading = new float[3];
+    private static final float STRIDE_LENGTH = 74.0f;
+    private float[] DRPose = new float[2];
+    private boolean updatePosition = false;
+    ArrayList<Integer> beaconPoseList_X = new ArrayList<Integer>();
+    ArrayList<Integer> beaconPoseList_Y=new ArrayList<Integer>();
     public BeaconNavigateFragment() {
         super();
         //uncomment to add uuid filter
@@ -97,21 +119,119 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
         sensorEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
-                switch (sensorEvent.sensor.getType()) {
-                    case Sensor.TYPE_ACCELEROMETER: {
-                        System.arraycopy(sensorEvent.values, 0, accelerometerReading, 0, accelerometerReading.length);
-                        break;
-                    }
-                    case Sensor.TYPE_MAGNETIC_FIELD: {
-                        System.arraycopy(sensorEvent.values, 0, magnetometerReading, 0, magnetometerReading.length);
-                        break;
-                    }
-                    case Sensor.TYPE_GYROSCOPE: {
-                        System.arraycopy(sensorEvent.values, 0, gyroscopeReading, 0, gyroscopeReading.length);
-                        break;
-                    }
+               // Log.d(LOGTAG,"Onsensor changed");
+
+                //Restart sensors in every 10 sec to reduce the ingration error
+               if ( (SystemClock.elapsedRealtime() - sensorStartTime) > 10000) {
+                    sensorStartTime = SystemClock.elapsedRealtime();
+                    onResume();
                 }
 
+                if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                    System.arraycopy(sensorEvent.values, 0, accelerometerReading,0, accelerometerReading.length);
+                }
+                else if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                    System.arraycopy(sensorEvent.values, 0, magnetometerReading, 0, magnetometerReading.length);
+                    SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerReading, magnetometerReading);
+                    heading = Math.atan2(rotationMatrix[3], rotationMatrix[0]);
+               //  Log.d("onSensorChanged ", " sensor:M " + sensorEvent.sensor.getType() + ", heading: " + heading);
+
+                }
+                else if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                    System.arraycopy(sensorEvent.values, 0, magnetometerReading, 0, magnetometerReading.length);
+                    SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerReading, magnetometerReading);
+                    heading = Math.atan2(rotationMatrix[3], rotationMatrix[0]);
+//            Log.d("onSensorChanged ", " sensor:M " + sensorEvent.sensor.getType() + ", heading: " + heading);
+
+                }
+                else if (sensorEvent.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
+                    System.arraycopy(sensorEvent.values, 0, linAccReading,0, linAccReading.length);
+                    float norm = calcNorm(sensorEvent.values[0] + sensorEvent.values[1] + sensorEvent.values[2]);
+                   // Log.d("Norm ", ""+norm);
+                    boolean stepFound = dynamicStepCounter.findStep(norm);
+                    //Log.d("step found ", ""+stepFound);
+                    if (stepFound) {
+//                Log.d("onSensorChanged ", " estimatedPose: (" + estimatedPose[0] + ", " + estimatedPose[1] + ")" );
+
+                        float rPointX = (float) (estimatedPose[0] - STRIDE_LENGTH * Math.sin(heading) );
+                        float rPointY = (float) (estimatedPose[1] + STRIDE_LENGTH * Math.cos(heading) );
+
+                       // Log.d("onSensorChanged ", "Sensor_Pose: (x, y) = " + rPointX + ", " + rPointY + ", heading: " + heading);
+                       // tv1.setText("Sensor_Pose: (x, y) = " + rPointX + " , " + rPointY + "\n heading: " + heading);
+
+
+                        DRPose[0] = rPointX;
+                        DRPose[1] = rPointY;
+
+                        updatePosition = true;
+                        positionUpdateTime = SystemClock.elapsedRealtime();
+
+                    }
+                    else {
+                        DRPose = estimatedPose;
+                    }
+
+                }
+                else if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
+
+                    Log.d("onSensorChanged", "Step detector: " + sensorEvent.values[0] );
+
+                    boolean stepFound = (sensorEvent.values[0] == 1);
+                    if (stepFound) {
+//                Log.d("onSensorChanged ", " estimatedPose: (" + estimatedPose[0] + ", " + estimatedPose[1] + ")" );
+
+                        float rPointX = (float) (estimatedPose[0] - STRIDE_LENGTH * Math.sin(heading) );
+                        float rPointY = (float) (estimatedPose[1] + STRIDE_LENGTH * Math.cos(heading) );
+
+                        // Log.d("onSensorChanged ", "Sensor_Pose: (x, y) = " + rPointX + ", " + rPointY + ", heading: " + heading);
+                        // tv1.setText("Sensor_Pose: (x, y) = " + rPointX + " , " + rPointY + "\n heading: " + heading);
+
+
+                        DRPose[0] = rPointX;
+                        DRPose[1] = rPointY;
+
+                        updatePosition = true;
+                        positionUpdateTime = SystemClock.elapsedRealtime();
+
+                    }
+                    else {
+                        DRPose = estimatedPose;
+                    }
+
+                }
+                if ( (!updatePosition) && ((SystemClock.elapsedRealtime() - positionUpdateTime) > 5000) ) {
+
+                    updatePosition = true;
+                    //Log.d("onSensorChanged", "Time elapsed....");
+                    positionUpdateTime = SystemClock.elapsedRealtime();
+                }
+                if (updatePosition) {
+
+                    updatePosition = false;
+
+                    float[] meanBeaconPose = new float[2];
+
+                    if (beaconPoseList_X.size() != 0) {
+
+                        meanBeaconPose = calculateMean();
+                        beaconPoseList_X.clear();
+                        beaconPoseList_Y.clear();
+
+                        calculateKalmanDistance(DRPose, meanBeaconPose);
+
+                    }else {
+                        estimatedPose = DRPose;
+                    }
+
+                   // Log.d("onSensorChanged ", " DR_pose: (" + DRPose[0] + ", " + DRPose[1] + "), beacon_pose: (" + meanBeaconPose[0] + ", " + meanBeaconPose[1]
+                            //+ "), fusion_pose: (" + estimatedPose[0] + ", " + estimatedPose[1] + ")" );
+
+//            Bundle bundle = new Bundle();
+//            bundle.putFloatArray("fusion_pose", estimatedPose);
+//            BeaconNavigateFragment beaconNavigateFragment = new BeaconNavigateFragment();
+//            beaconNavigateFragment.setArguments(bundle);
+//            getFragmentManager().beginTransaction().commit();
+                }
             }
 
             @Override
@@ -120,10 +240,100 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
             }
         };
     }
+    public static float calcNorm(double... args) {
+        double sumSq = 0;
+        for (double arg : args)
+            sumSq += Math.pow(arg, 2);
+        return (float)Math.sqrt(sumSq);
+    }
+    public float[] calculateMean() {
+
+        float[] mean_beacon_pose = {0, 0};
+        for (int i = 0; i < beaconPoseList_X.size(); i++)
+        {
+            mean_beacon_pose[0] += beaconPoseList_X.get(i);
+            mean_beacon_pose[1] += beaconPoseList_Y.get(i);
+        }
+        mean_beacon_pose[0] /= beaconPoseList_X.size();
+        mean_beacon_pose[1] /= beaconPoseList_X.size();
+
+        return mean_beacon_pose;
+
+    }
+    private float[] calculateKalmanDistance(float[] DR_pose, float[] mean_beacon_pose) {
+
+//        float errorCovarianceRssi;
+        float DRNoise = 1.25f;
+        float beaconNoise = 0.005f;
+
+        //prediction
+        float[] pose_apriori = { (estimatedPose[0] + DR_pose[0]) , (estimatedPose[1] + DR_pose[1]) };
+        float errorCovariance_apriori = errorCovariance + DRNoise;
+
+        //updation
+        float[] z_t = mean_beacon_pose;
+        float kalmanGain = errorCovariance_apriori / (errorCovariance_apriori + beaconNoise);
+        estimatedPose[0] = pose_apriori[0] + kalmanGain * (z_t[0] - pose_apriori[0]);
+        estimatedPose[1] = pose_apriori[1] + kalmanGain * (z_t[1] - pose_apriori[1]);
+        errorCovariance = (1 - kalmanGain) * errorCovariance_apriori;
+
+//        //prediction
+//        estimatedPose[0] += DR_pose[0];
+//        estimatedPose[1] += DR_pose[1];
+//        lastErrorCovariance += DRNoise;
+//
+//        //updation
+//        float[] z_t = mean_beacon_pose;
+//        float kalmanGain = lastErrorCovariance / (lastErrorCovariance + beaconNoise);
+//        errorCovarianceRssi = (1 - kalmanGain) * lastErrorCovariance;
+//        estimatedPose[0] += kalmanGain * (z_t[0] - estimatedPose[0]);
+//        estimatedPose[1] += kalmanGain * (z_t[1] - estimatedPose[1]);
+
+        return estimatedPose;
+
+//        private static float calculateKalmanRssi(List<AdvertisingPacket> advertisingPackets,
+//        float processNoise, float measurementNoise, float meanRssi) {
+//            float errorCovarianceRssi;
+//            float lastErrorCovarianceRssi = 1;
+//            float estimatedRssi = meanRssi;
+//            for (AdvertisingPacket advertisingPacket : advertisingPackets) {
+//                float kalmanGain = lastErrorCovarianceRssi / (lastErrorCovarianceRssi + measurementNoise);
+//                estimatedRssi = estimatedRssi + (kalmanGain * (advertisingPacket.getRssi() - estimatedRssi));
+//                errorCovarianceRssi = (1 - kalmanGain) * lastErrorCovarianceRssi;
+//                lastErrorCovarianceRssi = errorCovarianceRssi + processNoise;
+//            }
+//            return estimatedRssi;
+//        }
+
+
+    }
+
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-       // sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+
+        dynamicStepCounter = new DynamicStepCounter(1.0);
+        heading = 0;
+        estimatedPose[0] = 0;
+        estimatedPose[1] = 0;
+        errorCovariance = 0;
+
+        positionUpdateTime = SystemClock.elapsedRealtime();
+        sensorStartTime = SystemClock.elapsedRealtime();
+        Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if (accelerometer != null) {
+            sensorManager.registerListener (sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+        }
+        Sensor magneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        if (magneticField != null) {
+            sensorManager.registerListener(sensorEventListener, magneticField, SensorManager.SENSOR_DELAY_FASTEST);
+        }
+        Sensor linearAccelaration = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        if (linearAccelaration != null) {
+            sensorManager.registerListener(sensorEventListener, linearAccelaration, SensorManager.SENSOR_DELAY_FASTEST);
+        }
       //  sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
      //   sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
       //  sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
@@ -253,6 +463,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
         paintOut.setAntiAlias(true);
         mImageView=(ImageView)getView().findViewById(R.id.plan);
         tv_reset=(TextView)getView().findViewById(R.id.reset_path);
+        beacon_show=(CheckBox) getView().findViewById(R.id.beacon_show);
         Log.d("beacon","view created ");
         tempBitmap = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.RGB_565);
         path_bitmap = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.RGB_565);
@@ -296,7 +507,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
             }
         });
 
-        tv_reset.setOnClickListener(new View.OnClickListener() {
+       tv_reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getActivity().getApplicationContext(), "Path reset", Toast.LENGTH_SHORT).show();
@@ -311,7 +522,25 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
             }
         });
 
+       beacon_show.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+           @Override
+           public void onCheckedChanged(CompoundButton compoundButton, boolean iscChecked) {
+               if(iscChecked){
+                   Toast.makeText(getActivity().getApplicationContext(), "Viewing beacon location", Toast.LENGTH_SHORT).show();
+                   ArrayList<BeaconLoc> beaconlist= BeaconStore.getItemDataArrayList();
+                   for (BeaconLoc beacon: beaconlist){
+                       drawBeacon(3*beacon.getKx(),3*beacon.getKy(),beacon.getName());
+                   }
+               }
+               else {
+                   //Toast.makeText(getActivity().getApplicationContext(), "close Show beacon", Toast.LENGTH_SHORT).show();
+                   mImageView.setImageResource(R.drawable.gadgeon_sec);
+               }
+           }
+       });
+
     }
+
     public double[] findNearestPixel(double[] position, double[][] list){
 
         ArrayList<Double> distances= new ArrayList<>();
@@ -452,6 +681,16 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
 
         mImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
     }
+    private void drawBeacon(int x,int y,String beaconName) {
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        paint.setColor(getResources().getColor(R.color.md_pink_900));
+        paint.setTextSize(200);
+        tempCanvas.drawText(beaconName.replace("beacon","B-"),x-120,y-110,paint);
+        paint.setColor(getResources().getColor(R.color.primary_dark_trans));
+        tempCanvas.drawRect(x-100 ,y-100,x+100,y+100,paint);
+
+        mImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
+    }
     private void drawRoute(float [] array) {
 
 
@@ -476,9 +715,8 @@ public class BeaconNavigateFragment extends BeaconViewFragment  {
         path_canvas.drawCircle(3*input_cordinates[2],3*input_cordinates[3],50,custom_paint);
         mImageView.setImageDrawable(new BitmapDrawable(getResources(), path_bitmap));
         copy_bmp=path_bitmap;
+
     }
-
-
 
 
 }

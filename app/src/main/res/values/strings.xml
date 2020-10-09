@@ -90,4 +90,7 @@
     <string name="reset_path">
           <u>Reset Path</u>
     </string>
+    <string name="show_beacon">
+          <u>Show Beacon</u>
+    </string>
 </resources>
