@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -42,7 +43,7 @@ public class BluetoothClient {
 
     private RxBleClient rxBleClient;
     private Subscription scanningSubscription;
-
+    static Handler handler = new Handler();
 
     public BluetoothClient() {
 
@@ -144,7 +145,7 @@ public class BluetoothClient {
         final Location beaconLocation = new Location();
 
         try {
-            BeaconLoc vBeaconLoc = BeaconStore.getCurrentItem(iBeacon.getMinor());
+            final BeaconLoc vBeaconLoc = BeaconStore.getCurrentItem(iBeacon.getMinor());
             Log.d("beacon","inside " + vBeaconLoc.getName());
             beacon.setMajorId(iBeacon.getMajor());
             beacon.setMinorId(iBeacon.getMinor());
@@ -154,6 +155,15 @@ public class BluetoothClient {
             beaconLocation.setLatitude(10.0199105668819222);
             beaconLocation.setLongitude(76.35076967277124);
             Toast.makeText(mContext,"Registering  "+vBeaconLoc.getName(),Toast.LENGTH_SHORT).show();
+
+            handler.postDelayed(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                  //  Toast.makeText(mContext,"Registering  "+vBeaconLoc.getName(),Toast.LENGTH_SHORT).show();
+                }
+            }, 3000);
         } catch (Exception e) {
             Log.d("beacon","Errorr while registering beacon :  " + iBeacon.getMinor());
           //  if (iBeacon.getMinor()==80){

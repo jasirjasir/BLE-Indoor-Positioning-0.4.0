@@ -148,12 +148,14 @@ public class SensorEventFragment extends Fragment implements SensorEventListener
         }
         Sensor magneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         if (magneticField != null) {
+            Log.d("register","registering magneticField");
             sensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_FASTEST);
         }
         if (stepDetector) {
             Sensor step_Detector = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
             if(step_Detector != null) {
-                sensorManager.registerListener(this, step_Detector, SensorManager.SENSOR_DELAY_FASTEST);
+                Log.d("register","registering step detector");
+                sensorManager.registerListener(this, step_Detector, SensorManager.SENSOR_DELAY_NORMAL);
             }
         } else {
             Sensor linearAccelaration = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
@@ -176,11 +178,12 @@ public class SensorEventFragment extends Fragment implements SensorEventListener
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
+        Log.d("onsensor","onSensorChanged");
 
         //Restart sensors in every 10 sec to reduce the ingration error
         if ( (SystemClock.elapsedRealtime() - sensorStartTime) > 10000) {
             sensorStartTime = SystemClock.elapsedRealtime();
-            onResume();
+           // onResume();
         }
 
         if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -197,7 +200,7 @@ public class SensorEventFragment extends Fragment implements SensorEventListener
             System.arraycopy(sensorEvent.values, 0, linAccReading,0, linAccReading.length);
             float norm = calcNorm(sensorEvent.values[0] + sensorEvent.values[1] + sensorEvent.values[2]);
             Log.d("Norm ", ""+norm);
-            boolean stepFound = dynamicStepCounter.findStep(norm);
+            boolean stepFound = dynamicStepCounter.findStep(norm, 0.0);
             Log.d("step found ", ""+stepFound);
             if (stepFound) {
 //                Log.d("onSensorChanged ", " estimatedPose: (" + estimatedPose[0] + ", " + estimatedPose[1] + ")" );
@@ -221,11 +224,12 @@ public class SensorEventFragment extends Fragment implements SensorEventListener
             }
 
         }
-        else if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
+         if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
 
-            Log.d("onSensorChanged", "Step detector: " + sensorEvent.values[0] );
+            Log.e("onSensorChanged", "Step detector: " + sensorEvent.values[0] );
 
             boolean stepFound = (sensorEvent.values[0] == 1);
+            Log.d("onSensorChanged", "Step found: " + stepFound );
             if (stepFound) {
 //                Log.d("onSensorChanged ", " estimatedPose: (" + estimatedPose[0] + ", " + estimatedPose[1] + ")" );
 
@@ -233,7 +237,7 @@ public class SensorEventFragment extends Fragment implements SensorEventListener
                 float rPointY = (float) (estimatedPose[1] + STRIDE_LENGTH * Math.cos(heading) );
 
                 // Log.d("onSensorChanged ", "Sensor_Pose: (x, y) = " + rPointX + ", " + rPointY + ", heading: " + heading);
-                // tv1.setText("Sensor_Pose: (x, y) = " + rPointX + " , " + rPointY + "\n heading: " + heading);
+                tv1.setText("Sensor_Pose: (x, y) = " + rPointX + " , " + rPointY + "\n heading: " + heading);
 
 
                 DRPose[0] = rPointX;

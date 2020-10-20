@@ -12,6 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginBottom="10dp"
         android:orientation="horizontal"
+        android:id="@+id/top_layout"
         android:paddingBottom="5dp"
         android:background="@color/primary_text"
         android:backgroundTint="@color/primary_text"
@@ -54,21 +55,47 @@
             android:elevation="24dp"/>
     </LinearLayout>
     <!-- android:background="@drawable/gracevilla_gf"-->
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true">
-
-
-        <ImageView
-            android:id="@+id/plan"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="-1dp"
-            android:layout_marginTop="-19dp"
+            android:orientation="horizontal"
+            android:layout_below="@+id/top_layout">
+        <ImageView
+            android:id="@+id/plan"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+
+
             android:src="@drawable/gadgeon_sec" />
 
-    </FrameLayout>
+
+            <TextView
+                android:id="@+id/id_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="80dp"
+                android:layout_marginTop="50dp"
+                android:text="beacon data display  here"
+                android:textColor="@color/md_white_1000" />
+
+            <TextView
+                android:id="@+id/id_debug1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="80dp"
+                android:layout_marginTop="500dp"
+                android:text="Debug 1"
+                android:textColor="@color/md_white_1000" />
+
+            <TextView
+                android:id="@+id/id_debug2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="80dp"
+                android:layout_marginTop="550dp"
+                android:text="Debug 2"
+                android:textColor="@color/md_white_1000" />
+        </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -90,7 +117,8 @@
             android:textColor="@color/md_white_1000"
             android:id="@+id/reset_path"
             android:clickable="true"
-            android:layout_marginLeft="50dp"
+
+            android:layout_marginLeft="10dp"
            />
      <!--   <TextView
             android:layout_width="wrap_content"
@@ -105,10 +133,17 @@
             android:id="@+id/beacon_show"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/md_white_1000"
-            android:layout_marginLeft="50dp"
-            android:text="Beacons" />
+            android:layout_marginLeft="20dp"
+            android:text="Beacons"
+            android:textColor="@color/md_white_1000" />
 
+        <CheckBox
+            android:id="@+id/debug"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/md_white_1000"
+            android:layout_marginLeft="25dp"
+            android:text="Debug" />
         <ImageView
             android:id="@+id/go_button"
             android:layout_width="wrap_content"

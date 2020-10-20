@@ -5,6 +5,7 @@ import android.util.Log;
 public class DynamicStepCounter {
 
     public static final int REQUIRED_HZ = 500;
+    public static final int STEP_TIME_GAP = 500;
 
     private int stepCount;
     private double sensitivity;
@@ -18,6 +19,7 @@ public class DynamicStepCounter {
 
     private double sumAcc, avgAcc;
     private int runCount;
+    private double lastStepTime;
 
     public DynamicStepCounter() {
 
@@ -35,6 +37,7 @@ public class DynamicStepCounter {
         sumAcc = avgAcc = 0;
         runCount = 0;
 
+        lastStepTime = 0;
     }
 
     //Set the default values for variables
@@ -44,19 +47,21 @@ public class DynamicStepCounter {
     }
 
     //determines if graph peaks (step found), and if so returns true
-    public boolean findStep(double acc) {
+    public boolean findStep(double acc, double time) {
 
         //set the thresholds that are used to find the peaks
 //        setThresholdsDiscreet(acc);
-        setThresholdsContinuous(acc);
+        setThresholdsContinuous(acc, time);
         //Log.d("StepCounter", "Acc: " + acc);
         //Log.d("StepCounter", "upperThreshold: " + upperThreshold);
         //Log.d("StepCounter", "peakFound: " + peakFound);
         //finds a point (peak) above the upperThreshold
         if (acc > upperThreshold) {
+            double elapsedTime = (time - lastStepTime)/1000000;
             //Log.d("StepCounter", "acc > upperThreshold ");
 
-            if (!peakFound) {
+            if( (!peakFound) && (elapsedTime > STEP_TIME_GAP)) {
+                lastStepTime = time;
                 stepCount++;
                 peakFound = true;
                 return true;
@@ -114,12 +119,17 @@ public class DynamicStepCounter {
 
     }
 
-    public void setThresholdsContinuous(double acc) {
+    public void setSensitivity(double sensitivity) {
+        this.sensitivity = sensitivity;
+    }
+
+    public void setThresholdsContinuous(double acc, double time) {
 
         runCount++;
 //        Log.d("StepCounter", "runCount: " + runCount + ", firstRun: " + firstRun);
 
         if (firstRun) {
+            lastStepTime = time;
             upperThreshold = acc + sensitivity;
             lowerThreshold = acc - sensitivity;
 
