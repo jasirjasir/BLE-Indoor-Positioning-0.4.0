@@ -51,7 +51,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     private BottomNavigationView bottomNavigationView;
     static {
         if (!OpenCVLoader.initDebug()) {
-            Log.d("pahPlanning", "Unable to load OpenCV");
+            Log.d("pathPlanning", "Unable to load OpenCV");
         } else {
             System.loadLibrary("localize-lib");
             System.loadLibrary("trilateration-lib");
@@ -77,7 +77,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         //set beacon locations
         BeaconStore.setBeaconArrayList(getBeaconsFromJSON());
 
-        // setup locationc
+        // setup location
         AndroidLocationProvider.initialize(this);
 
         // setup bluetooth
