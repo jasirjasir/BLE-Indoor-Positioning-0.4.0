@@ -56,6 +56,7 @@ public class DeviceSensorLooper {
 
     ArrayList<Integer> beaconPoseList_X = new ArrayList<Integer>();
     ArrayList<Integer> beaconPoseList_Y = new ArrayList<Integer>();
+    ArrayList<Long> beaconTime = new ArrayList<Long>();
 
     private double heading;
     private DynamicStepCounter dynamicStepCounter;
@@ -164,25 +165,25 @@ public class DeviceSensorLooper {
 //                        if (dynamicStepCounter.getSensitivity() == mSensitivity) {
                         float rPointX, rPointY;
                         mStepCount++;
+                        Log.d("onSensorChanged ", " mStepCount: " + mStepCount);
                         Log.d("onSensorChanged ", " estimatedPose: (" + estimatedPose[0] + ", " + estimatedPose[1] + ")");
                         rPointX = (float) (estimatedPose[0] - STRIDE_LENGTH * Math.sin(heading));
                         rPointY = (float) (estimatedPose[1] + STRIDE_LENGTH * Math.cos(heading));
+                        Log.d("onSensorChanged ", " rPointX: " + rPointX+"rPointY ="+rPointY);
                         DRPose[0] = rPointX;
                         DRPose[1] = rPointY;
                         updatePosition = true;
                         positionUpdateTime = SystemClock.elapsedRealtime();
+                        mSensorDataListener.onSensorChange( DRPose, mStepCount);
                     } else {
                         DRPose = estimatedPose;
                     }
                 }
-                mSensorDataListener.onSensorChange(updatePosition, DRPose);
-
-                /*synchronized (registeredListeners) {
-                    for (SensorEventListener listener : registeredListeners) {
-                        listener.onSensorChanged(sensorEvent);
-                    }
-                }*/
-
+                if ((!updatePosition) && ((SystemClock.elapsedRealtime() - positionUpdateTime) > 5000)) {
+                    updatePosition = true;
+                    positionUpdateTime = SystemClock.elapsedRealtime();
+                    mSensorDataListener.onSensorChange(DRPose, mStepCount);
+                }
             }
 
             @Override
@@ -250,6 +251,20 @@ public class DeviceSensorLooper {
 
     public void firstBeaconPoseReceived(){
         firstBeaconPoseReceived = true;
+        beaconAvgTime = SystemClock.elapsedRealtime();
+    }
+
+    public void setBeaconPoseData(double[] poseArray){
+        beaconPoseList_X.add((int) poseArray[0]);
+        beaconPoseList_Y.add((int) poseArray[1]);
+        beaconTime.add(SystemClock.elapsedRealtime());
+        for (int i = beaconPoseList_X.size() - 1; i >= 0; i--) {
+            if ((SystemClock.elapsedRealtime() - beaconTime.get(i)) > 3000) {
+                beaconPoseList_X.remove(i);
+                beaconPoseList_Y.remove(i);
+                beaconTime.remove(i);
+            }
+        }
     }
 
 

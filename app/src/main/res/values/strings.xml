@@ -93,4 +93,6 @@
     <string name="show_beacon">
           <u>Show Beacon</u>
     </string>
+    <string name="step_count">Step Count</string>
+    <string name="beacon_data_displayed_here">Beacon data displayed here</string>
 </resources>

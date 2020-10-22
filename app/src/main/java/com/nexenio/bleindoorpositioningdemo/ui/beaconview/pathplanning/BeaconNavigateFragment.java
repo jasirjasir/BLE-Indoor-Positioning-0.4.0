@@ -70,7 +70,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment implements Sensor
 
     ImageView mImageView;
     AutoCompleteTextView start_act, stop_act;
-    TextView tv_reset, tv_display, tv_debug1, tv_debug2;
+    TextView tv_reset, tv_display, tv_debug1, tv_debug2, tv_stepCount;
     CheckBox beacon_show, debug_box;
 
     private SensorEventListener sensorEventListener;
@@ -112,7 +112,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment implements Sensor
     private static final float STRIDE_LENGTH = 50.0f;   //74.0f;
     private static final int INITIAL_STEP_COUNT = 4;
     private float[] DRPose = new float[2];
-    private boolean updatePosition = false;
+    //private boolean updatePosition = false;
     ArrayList<Integer> beaconPoseList_X = new ArrayList<Integer>();
     ArrayList<Integer> beaconPoseList_Y = new ArrayList<Integer>();
     ArrayList<Long> beaconTime = new ArrayList<Long>();
@@ -436,21 +436,21 @@ public class BeaconNavigateFragment extends BeaconViewFragment implements Sensor
         };
     }
 
-    public void addTolist(double[] array) {
+    public void addTolist(double[] poseArray) {
         if (!firstBeaconPoseReceived) {
             firstBeaconPoseReceived = true;
             mDeviceSensorLooper.firstBeaconPoseReceived();
-            beaconAvgTime = SystemClock.elapsedRealtime();
 
 //            estimatedPose[0] = (float)array[0];
 //            estimatedPose[1] = (float)array[1];
         }
-        x_list.add((int) array[0]);
-        y_list.add((int) array[1]);
-        beaconPoseList_X.add((int) array[0]);
-        beaconPoseList_Y.add((int) array[1]);
+        x_list.add((int) poseArray[0]);
+        y_list.add((int) poseArray[1]);
+        beaconPoseList_X.add((int) poseArray[0]);
+        beaconPoseList_Y.add((int) poseArray[1]);
         beaconTime.add(SystemClock.elapsedRealtime());
-        tv_debug1.setText("BLE predicted X =" + (int) array[0] + " Y= " + (int) array[1]);
+
+        tv_debug1.setText("BLE predicted X =" + (int) poseArray[0] + " Y= " + (int) poseArray[1]);
 
         for (int i = beaconPoseList_X.size() - 1; i >= 0; i--) {
             if ((SystemClock.elapsedRealtime() - beaconTime.get(i)) > 3000) {
@@ -459,8 +459,9 @@ public class BeaconNavigateFragment extends BeaconViewFragment implements Sensor
                 beaconTime.remove(i);
             }
         }
-        //Log.d(LOGTAG,"predicted X ="+(int) array[0] +" Y= "+(int) array[1]);
 
+        mDeviceSensorLooper.setBeaconPoseData(poseArray);
+        //Log.d(LOGTAG,"predicted X ="+(int) array[0] +" Y= "+(int) array[1]);
     }
 
     public double[] calculateAverageVal() {
@@ -511,6 +512,8 @@ public class BeaconNavigateFragment extends BeaconViewFragment implements Sensor
         tv_display = (TextView) getView().findViewById(R.id.id_display);
         tv_debug1 = (TextView) getView().findViewById(R.id.id_debug1);
         tv_debug2 = (TextView) getView().findViewById(R.id.id_debug2);
+        tv_stepCount = getView().findViewById(R.id.step_count_tv);
+
 
         beacon_show = (CheckBox) getView().findViewById(R.id.beacon_show);
         debug_box = (CheckBox) getView().findViewById(R.id.debug);
@@ -832,13 +835,7 @@ public class BeaconNavigateFragment extends BeaconViewFragment implements Sensor
     }
 
     @Override
-    public void onSensorChange(boolean updatePosition, float[] DRPose) {
-        if ((!updatePosition) && ((SystemClock.elapsedRealtime() - positionUpdateTime) > 5000)) {
-            updatePosition = true;
-            positionUpdateTime = SystemClock.elapsedRealtime();
-        }
-        if (updatePosition) {
-            updatePosition = false;
+    public void onSensorChange(float[] DRPose, final int pStepCount) {
             float[] meanBeaconPose = new float[2];
             if (beaconPoseList_X.size() != 0) {
                 meanBeaconPose = calculateMean();
@@ -848,10 +845,15 @@ public class BeaconNavigateFragment extends BeaconViewFragment implements Sensor
             }
             Log.d("onSensorChanged ", " DR_pose: (" + DRPose[0] + ", " + DRPose[1] + "), beacon_pose: (" + meanBeaconPose[0] + ", " + meanBeaconPose[1]
                     + "), fusion_pose: (" + estimatedPose[0] + ", " + estimatedPose[1] + ")");
-            tv_debug2.setText("Estimated POS  X =" + (int) estimatedPose[0] + " Y= " + (int) estimatedPose[1]);
+            getActivity().runOnUiThread(new Runnable() {
 
-            //drawLocation_sensor(scaling_factor*(int)estimatedPose[0],scaling_factor*(int)estimatedPose[1]);
-            drawLocation_sensor(scaling_factor * (2490 - (int) estimatedPose[1]), scaling_factor * (1477 - (int) estimatedPose[0]));
-        }
+                @Override
+                public void run() {
+                    tv_debug2.setText("Estimated POS  X =" + (int) estimatedPose[0] + " Y= " + (int) estimatedPose[1]);
+                    //drawLocation_sensor(scaling_factor*(int)estimatedPose[0],scaling_factor*(int)estimatedPose[1]);
+                    tv_stepCount.setText("Steps: " + pStepCount);
+                    drawLocation_sensor(scaling_factor * (2490 - (int) estimatedPose[1]), scaling_factor * (1477 - (int) estimatedPose[0]));
+                }
+            });
     }
 }

@@ -75,7 +75,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="80dp"
                 android:layout_marginTop="50dp"
-                android:text="beacon data display  here"
+                android:text="@string/beacon_data_displayed_here"
+                android:textColor="@color/md_white_1000" />
+            <TextView
+                android:id="@+id/step_count_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="80dp"
+                android:layout_marginTop="20dp"
+                android:text="@string/step_count"
                 android:textColor="@color/md_white_1000" />
 
             <TextView
